@@ -1,5 +1,5 @@
 //---------- I2C setting ------------------------------------------------------------------------
-#include <Wire.h> 
+#include <Wire.h>
 
 //---------- 128x64 OLED setting ----------------------------------------------------------------
 #define OLED_096_INCH   1
@@ -12,97 +12,97 @@
 #include <Adafruit_GFX.h>
 
 #if (DISPLAY_SIZE == OLED_096_INCH)
- #include <Adafruit_SSD1306.h>
+#include <Adafruit_SSD1306.h>
 #endif
 #if (DISPLAY_SIZE == OLED_130_INCH)
- #include <Adafruit_SH1106.h>
+#include <Adafruit_SH1106.h>
 #endif
 
 #if (DISPLAY_SIZE == OLED_096_INCH)
- Adafruit_SSD1306 display(OLED_RESET);
+Adafruit_SSD1306 display(OLED_RESET);
 #endif
 #if (DISPLAY_SIZE == OLED_130_INCH)
- Adafruit_SH1106 display(OLED_RESET);
+Adafruit_SH1106 display(OLED_RESET);
 #endif
 
 int i, j = 0;
-int curColumn = 0, curRow = 40, countOnOff = 0;
-
-void menu()
-{   
-  display.setCursor(30, 40);
-  display.println("START");
-  
-  display.setCursor(30, 50);
-  display.print("QUIT");
-  display.display();
-//display.clearDisplay();
-}
-
-void start()
-{display.clearDisplay();
-  display.print("start");
-}
-
-void quit()
-{display.clearDisplay();
-display.print("quit");
-}
+int curColumn = 0, curRow = 40, menuChoice = 0;
+int button, button2;
 
 void setup()
 {
   Wire.begin();
-  
+
   // OLED Display initial setting to operation
-  Init_OLED(); 
+  Init_OLED();
   OLED_Display();
- 
+
 
   pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
+  //pinMode(A0,
 
 }
-void loop(){
+void loop() {
 
-//delay(500);
-menu();
+  //delay(500);
+
   int button = digitalRead(3);
-  
-  if(button == HIGH) {
-    
+  int button2 = digitalRead(4);
+
+  if (button == HIGH) {
   }
   else
-  {countOnOff++;
+  {
     display.clearDisplay();
-    display.setCursor(100, curRow);
-    
-    display.print("*");
-    
-    delay(500);
+    menu();
+    delay(300);
 
-    if(curRow <= 40){
+    display.setCursor(100, curRow);
+    display.print("*");
+    display.display();
+    if (curRow <= 40) {
       curRow += 10;
-    }else
+    } else
     {
       curRow = 40;
-    }
-   
-    if ((countOnOff % 2) == true) start();
-  else quit();
-     display.display(); 
+    }//display.clearDisplay();
+    menuChoice++;
+
   }
-  
-      
+
+
+  if (button2 == HIGH) {
+
+  }
+
+  if (button2 == LOW) {
+    if ((menuChoice % 2) == 1)
+    {
+      start();
+    }
+    else
+    {
+      quit();
+    }
+
+  }
+
+
+
+  //display.clearDisplay();
+  display.display();
 }
 
 void Init_OLED() {
-  
+
   // OLED Display initial setting to operation
-  #if (DISPLAY_SIZE == OLED_096_INCH)
-   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  #endif
-  #if (DISPLAY_SIZE == OLED_130_INCH)
-   display.begin(SH1106_SWITCHCAPVCC, 0x3C);
-  #endif
+#if (DISPLAY_SIZE == OLED_096_INCH)
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+#endif
+#if (DISPLAY_SIZE == OLED_130_INCH)
+  display.begin(SH1106_SWITCHCAPVCC, 0x3C);
+#endif
   display.display();
   delay(1);
   display.clearDisplay();
@@ -110,13 +110,47 @@ void Init_OLED() {
 }
 
 void OLED_Display() {
-  
+
   display.setTextSize(1); // Or display.setTextSize(2);
   display.setTextColor(WHITE);
-  display.setCursor(0,0);
+  display.setCursor(0, 0);
   //display.println(String( ) + ":" + String( ));
 
   display.display();
   display.clearDisplay();
-    
+
+}
+
+
+void menu()
+{
+  display.setCursor(30, 40);
+  display.println("START");
+
+  display.setCursor(30, 50);
+  display.print("QUIT");
+}
+
+void start()
+{ display.clearDisplay();
+  display.setCursor(40, 30);
+  display.print("Launched");
+}
+
+void quit()
+{
+
+  display.clearDisplay();
+
+  if (button2 == HIGH) {
+    display.setCursor(50, 30);
+    display.print("EXIT?");
+      display.display();
+
+  }    if (button2 == LOW) {
+      display.setCursor(60, 30);
+      display.print("BYE");
+        display.display();
+    }
+
 }
